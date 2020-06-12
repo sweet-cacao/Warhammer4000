@@ -3,4 +3,4 @@
 check our game here
 https://salty-ravine-99918.herokuapp.com/
 ###
-thanks  to cnails for nice game we made together
+thanks  to https://github.com/cnails for nice game we made together
