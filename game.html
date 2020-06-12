@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+    <title>GAME</title>
+</head>
+<body>
+    <div class="invis" id="damage_1" value="%%damage_1%%"></div>
+    <div class="invis" id="damage_2" value="%%damage_2%%"></div>
+    <div class="invis" id="hp_1" value="%%hp_1%%"></div>
+    <div class="invis" id="hp_2" value="%%hp_2%%"></div>
+    <section class="header">
+        <div class="container">
+            <div class="title">
+                <h1>EPIC GAME</h1>
+            </div>
+        </div>
+    </section>
+    <section class="info">
+        <div class="container">
+            <div class="data">
+                Ход игрока №<span>1</span>
+            </div>
+            <div class="action">
+                Бросьте кубик
+            </div>
+            <div class="number_mv"></div>
+            <div class="hp_menu">
+                <div class="hp_bar">
+                    <div class="hp_data">%%name_1%%</div>
+                    <div class="hp_ship_1"></div>
+                </div>
+                <div class="hp_bar">
+                    <div class="hp_data">%%name_2%%</div>
+                    <div class="hp_ship_2"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="game">
+        <div class="container">
+            <div class="cube">
+                <div class="cube_number">0</div>
+            </div>
+            <div class="grid">
+                <div class="ship" id="ship_1">
+                    <img src="%%img_1%%" alt="ship_1">
+                </div>
+                <div class="ship rotateUp" id="ship_2">
+                    <img src="%%img_2%%" alt="ship_2">
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <script>
+        action = "cube";
+        player = 1;
+        hp_1 = 400;
+        hp_2 = 400;
+        step = 15;
+        numberMoves = 0;
+        function changeHp() {
+            var enemy = player == 1 ? 2 : 1;
+            var damage = Number.parseInt(document.querySelector("#damage_" + player).getAttribute("value"));
+            var hp = Number.parseInt(document.querySelector("#hp_" + enemy).getAttribute("value"));
+            var current_hp = Number.parseInt(document.querySelector("#hp_" + enemy).innerHTML) || hp;
+            current_hp -= damage;
+            document.querySelector("#hp_" + enemy).innerHTML = current_hp;
+            if (current_hp <= 0) {
+                document.querySelector("#ship_" + enemy).classList.add("invis");
+                document.querySelector(".hp_ship_" + enemy).style.width = "0";
+                changeAction("WINNER - player_" + player);
+                action = "stop"
+                return;
+            }
+            var proc = Math.floor(current_hp / (hp / 100));
+            document.querySelector(".hp_ship_" + enemy).style.width = proc + "%";
+            if (proc <= 60 && proc >= 30) {
+                document.querySelector(".hp_ship_" + enemy).style.backgroundColor = "#BFC34B";
+            } else if (proc < 30) {
+                document.querySelector(".hp_ship_" + enemy).style.backgroundColor = "#AC3B39";
+            }
+        }
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * Math.floor(max));
+        }
+        function spawnHp() {
+            var box = document.createElement("div");
+            box.classList.add("apteka");
+            box.innerHTML = "+";
+            box.style.top = getRandomInt(440);
+            box.style.left = getRandomInt(900);
+            document.querySelector(".grid").appendChild(box);
+        }
+        for (var index = 1; index < 8; index++) {
+            setTimeout(spawnHp, index * 10000);            
+        }
+        // spawnHp();
+        async function changeAction(text) {
+            document.querySelector(".action").innerHTML = "";
+            for (let index = 0; index < text.length; index++) {
+                document.querySelector(".action").innerHTML = document.querySelector(".action").innerHTML + text[index];
+                await sleep(30);
+            }
+        }
+        function changePlayer() {
+            player = player == 2 ? 1 : 2;
+            document.querySelector(".data span").innerHTML = player;
+            changeAction("Бросьте кубик");
+        }
+        function dodge() {
+            numberMoves--;
+            document.querySelector(".action").innerHTML = "Number of moves: " + numberMoves;
+            if (numberMoves === 0) {
+                action = "cube";
+                changePlayer();
+            }
+        }
+        document.addEventListener('click', async function(event) {
+            event.preventDefault();
+            if ((event.toElement == document.querySelector(".cube") || event.toElement == document.querySelector(".cube_number")) && action === "cube") {
+                while (numberMoves < 5) {
+                    numberMoves = getRandomInt(20);
+                }
+                document.querySelector(".cube_number").innerHTML = numberMoves;
+                changeAction("Number of moves: " + numberMoves);
+                action = "move";
+            }
+        });
+        // function checkHp() {
+        //     var ship = "#ship_" + player;
+        //     var boxes = document.querySelectorAll(".apteka");
+        //     var len = Object.keys(boxes).length;
+        //     var x = player == 1 ? document.querySelector(ship).style.top : document.querySelector(ship).style.bottom;
+        //     var y = player == 1 ? document.querySelector(ship).style.left : document.querySelector(ship).style.right;
+        //     x = Number.parseInt(x) || 0;
+        //     y = Number.parseInt(y) || 0;
+        //     for (var index = 0; index < len; index++) {
+        //         var elem = boxes[index];
+        //         var hp_x = elem.style.top;
+        //         var hp_y = elem.style.left;
+                
+        //     }
+        // }
+        document.addEventListener('keydown', function(event) {
+            event.preventDefault();
+            if (action !== "move") {
+                return;
+            }
+            var ship = "#ship_" + player;
+            if (event.code === "Space") {
+                var bullet = document.createElement("div");
+                var x = player == 1 ? document.querySelector(ship).style.top : document.querySelector(ship).style.bottom;
+                var enemy_x = player == 2 ? document.querySelector("#ship_1").style.top : document.querySelector("#ship_2").style.bottom;
+                var y = player == 1 ? document.querySelector(ship).style.left : document.querySelector(ship).style.right;
+                var enemy_y = player == 2 ? document.querySelector("#ship_1").style.left : document.querySelector("#ship_2").style.right;
+                x = Number.parseInt(x) || 0;
+                enemy_x = Number.parseInt(enemy_x) || 0;
+                y = Number.parseInt(y) || 0;
+                enemy_y = Number.parseInt(enemy_y) || 0;
+                enemy_y = 990 - enemy_y - 25;
+                enemy_x = 460 - enemy_x - 25;
+                if (document.querySelector(ship).classList.contains("rotateRight")) {
+                    bullet.classList.add("bullet");
+                    bullet.classList.add("rotateUp");
+                }
+                else if (document.querySelector(ship).classList.contains("rotateUp")) {
+                    bullet.classList.add("bullet_horizont");
+                    bullet.classList.add("rotateUp");
+                }
+                else if (document.querySelector(ship).classList.contains("rotateLeft")) {
+                    bullet.classList.add("bullet");
+                    bullet.classList.add("rotateUp");
+                }
+                else if (document.querySelector(ship).classList.contains("rotateDown")) {
+                    bullet.classList.add("bullet_horizont");
+                    bullet.classList.add("rotateUp");
+                } else {
+                    bullet.classList.add("bullet_horizont");
+                    bullet.classList.add("rotateUp");
+                }
+                if (player == 1) {
+                    if (bullet.classList.contains("bullet_horizont")) {
+                        if (document.querySelector(ship).classList.contains("rotateUp")) {
+                            bullet.style.top = "0 px";
+                            bullet.style.left = y + 12 + "px";
+                            bullet.style.height = x + "px";
+                            if (Math.abs(enemy_y - y) < 13 && enemy_x <= x) {
+                                changeHp();
+                            }
+                        } else {
+                            bullet.style.top = x + 25 + "px";
+                            bullet.style.left = y + 12 + "px";
+                            bullet.style.height = 460 - x - 25 + "px";
+                            if (Math.abs(enemy_y - y) < 13 && enemy_x >= x) {
+                                changeHp();
+                            }
+                        }
+                    } else {
+                        if (document.querySelector(ship).classList.contains("rotateLeft")) {
+                            bullet.style.left = "0 px";
+                            bullet.style.top = x + 12 + "px";
+                            bullet.style.width = y + "px";
+                            if (enemy_x == x && enemy_y <= y) {
+                                changeHp();
+                            }
+                        } else {
+                            bullet.style.top = x + 12 + "px";
+                            bullet.style.left = y + 25 + "px";
+                            bullet.style.width = 990 - y - 25 + "px";
+                            if (enemy_x == x && enemy_y >= y) {
+                                changeHp();
+                            }
+                        }
+                    }
+                } else {
+                    if (bullet.classList.contains("bullet_horizont")) {
+                        if (document.querySelector(ship).classList.contains("rotateUp")) {
+                            bullet.style.bottom = x + 25 + "px";
+                            bullet.style.right = y + 12 + "px";
+                            bullet.style.height = 460 - x - 25 + "px";
+                            if (Math.abs(enemy_y - y) < 13 && enemy_x >= x) {
+                                changeHp();
+                            }
+                        } else {
+                            bullet.style.bottom = "0";
+                            bullet.style.right = y + 12 + "px";
+                            bullet.style.height = x + "px";
+                            if (Math.abs(enemy_y - y) < 13 && enemy_x <= x) {
+                                changeHp();
+                            }
+                        }
+                    } else {
+                        if (document.querySelector(ship).classList.contains("rotateLeft")) {
+                            bullet.style.bottom = x + 12 + "px";
+                            bullet.style.right = y + 25 + "px";
+                            bullet.style.width = 990 - y - 25 + "px";
+                            if (enemy_x == x && enemy_y >= y) {
+                                changeHp();
+                            }
+                        } else {
+                            bullet.style.right = "0";
+                            bullet.style.bottom = x + 12 + "px";
+                            bullet.style.width = y + "px";
+                            if (enemy_x == x && enemy_y <= y) {
+                                changeHp();
+                            }
+                        }
+                    }
+                }
+                document.querySelector(".grid").appendChild(bullet);
+                dodge();
+            }
+            if (event.code === "ArrowDown") {
+                var x = player == 1 ? document.querySelector(ship).style.top : document.querySelector(ship).style.bottom;
+                x = Number.parseInt(x) || 0;
+                if (player == 2)
+                    if (x < step)
+                        return;
+                if (player == 1)
+                    if (x > (460 - step))
+                        return;
+                player == 1 ? document.querySelector(ship).style.top = x + step + "px" : document.querySelector(ship).style.bottom = x - step + "px"; 
+                document.querySelector(ship).classList.remove("rotateRight");
+                document.querySelector(ship).classList.remove("rotateLeft");
+                document.querySelector(ship).classList.remove("rotateDown");
+                document.querySelector(ship).classList.remove("rotateUp");
+                // checkHp();
+                dodge();
+            }
+            if (event.code === "ArrowUp") {
+                var x = player == 1 ? document.querySelector(ship).style.top : document.querySelector(ship).style.bottom;
+                x = Number.parseInt(x) || 0;
+                if (player == 1)
+                    if (x < step)
+                        return;
+                if (player == 2)
+                    if (x > (460 - step))
+                        return;
+                player == 1 ? document.querySelector(ship).style.top = x - step + "px" : document.querySelector(ship).style.bottom = x + step + "px"; 
+                document.querySelector(ship).classList.remove("rotateRight");
+                document.querySelector(ship).classList.remove("rotateLeft");
+                document.querySelector(ship).classList.remove("rotateDown");
+                document.querySelector(ship).classList.add("rotateUp");
+                dodge();
+            }
+            if (event.code === "ArrowRight") {
+                var x = player == 1 ? document.querySelector(ship).style.left : document.querySelector(ship).style.right;
+                x = Number.parseInt(x) || 0;
+                if (player == 2)
+                    if (x < step)
+                        return;
+                if (player == 1)
+                    if (x > (990 - step))
+                        return;
+                player == 1 ? document.querySelector(ship).style.left = x + step + "px" : document.querySelector(ship).style.right = x - step + "px"; 
+                document.querySelector(ship).classList.remove("rotateUp");
+                document.querySelector(ship).classList.remove("rotateLeft");
+                document.querySelector(ship).classList.remove("rotateLeft");
+                document.querySelector(ship).classList.add("rotateRight");
+                dodge();
+            }
+            if (event.code === "ArrowLeft") {
+                var x = player == 1 ? document.querySelector(ship).style.left : document.querySelector(ship).style.right;
+                x = Number.parseInt(x) || 0;
+                if (player == 1)
+                    if (x < step)
+                        return;
+                if (player == 2)
+                    if (x > (990 - step))
+                        return;
+                player == 1 ? document.querySelector(ship).style.left = x - step + "px" : document.querySelector(ship).style.right = x + step + "px"; 
+                document.querySelector(ship).classList.remove("rotateUp");
+                document.querySelector(ship).classList.remove("rotateLeft");
+                document.querySelector(ship).classList.remove("rotateRight");
+                document.querySelector(ship).classList.add("rotateLeft");
+                dodge();
+            }
+        });
+
+        function appendBlock() {
+            for (var index = 0; index < 150 * 100; index++) {
+                var block = document.createElement("div");
+                block.classList.add("block");
+                document.querySelector(".grid").appendChild(block);                
+            }
+        }
+        appendBlock();
+    </script>
+</body>
+</html>

@@ -39,7 +39,7 @@
     {  
         $_SESSION['arr'] = construct_flot($flot1);
         $_SESSION['arr2'] = construct_flot($flot2);
-        echo "<header><a style='font-size:150%;color:aqua;' href='index.php'>Start game".
+        echo "<header><a style='font-size:150%;color:aqua;' href='game.php'>Start game".
     "</a><br />".
     "Player 1: ".$flot1."<br />".
     "Player 2: ".$flot2."</header>";
