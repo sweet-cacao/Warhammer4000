@@ -1,0 +1,13 @@
+final class that extends ship;
+
+private $_name = "Chaos";
+private $_img = "img/ship3.png";
+private $_speed = 20;
+public $damage = 20;
+public $hp = 700;
+
+middle class of ship;
+
+diapason of shoot is 200 + speed;
+
+check doc of Ship;

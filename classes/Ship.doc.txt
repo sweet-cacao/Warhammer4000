@@ -1,0 +1,17 @@
+Abstract class includes following properties:
+protected $_name;
+protected $_img;
+protected $_speed;
+protected $damage;
+protected $hp;
+public static $verbose = False;
+
+if verbose is true it is printed when  a class was constucted or destructed;
+
+it has get for all properties and set only for damage and hp;
+
+function get_array returns all the properties as a hashmap;
+
+all children mast implement a method shoot;
+
+__invoke method shows the name and __call the list of available methods;

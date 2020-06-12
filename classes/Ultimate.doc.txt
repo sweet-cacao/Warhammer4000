@@ -1,0 +1,13 @@
+final class that extends ship;
+
+the lowest class of ship;
+
+private $_name = "Ultimate";
+private $_img = "img/ship5.png";
+private $_speed = 10;
+public $damage = 0;
+public $hp = 500;
+
+diapason of shoot is 50 + speed;
+
+check doc of Ship;

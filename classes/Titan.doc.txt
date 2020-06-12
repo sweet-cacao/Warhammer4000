@@ -1,0 +1,13 @@
+final class that extends ship;
+
+private $_name = "Titan";
+private $_img = "img/ship4.png";
+private $_speed = 30;
+public $damage = 50;
+public $hp = 1500;
+
+the most strong class of ship;
+
+diapason of shoot is 500 + speed;
+
+check doc of Ship;
