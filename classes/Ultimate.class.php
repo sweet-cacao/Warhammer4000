@@ -5,7 +5,7 @@ final Class Ultimate extends Ship
     protected $_name = "Ultimate";
     protected $_img = "img/ship5.png";
     protected $_speed = 10;
-    public $damage = 0;
+    public $damage = 10;
     public $hp = 500;
 
     public function __construct()
